@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Quantum HSM</title>
+</head>
+<body>
+  <h1> Quantum HSM</h1>
+  <p>A quantum-safe Hardware Security Module using Dilithium (NIST PQC standard).</p>
+
+  <h2> Try It</h2>
+  <pre>
+curl -X POST http://127.0.0.1:8080/generate \
+  -H 'Content-Type: application/json' \
+  -d '{ "wallet_id": "wallet1" }'
+
+curl -X POST http://127.0.0.1:8080/sign \
+  -H 'Content-Type: application/json' \
+  -d '{ "wallet_id": "wallet1", "message": "48656c6c6f", "is_hex": true }'
+  </pre>
+
+  <h2> Why Post-Quantum?</h2>
+  <p>After NIST's standardization of quantum-safe algorithms like Dilithium, using traditional ECDSA or RSA is no longer secure against future quantum attacks.</p>
+
+  <h2> Pricing</h2>
+  <ul>
+    <li><strong>Free</strong>: Localhost usage</li>
+    <li><strong>Pro</strong>: Cloud signing via managed instance</li>
+    <li><strong>Enterprise</strong>: On-premise HSM cluster support</li>
+  </ul>
+
+  <h2> Contact</h2>
+  <p>Have questions or need help? <a href='mailto:orlychikka@gmail.com'>Contact us</a>.</p>
+</body>
+</html>
