@@ -1,35 +1,68 @@
-# Quantum HSM (Hardware Security Module)
+# Quantum HSM
 
-Quantum HSM is a cutting-edge security module leveraging **quantum-resistant cryptography** to enhance security in **blockchain and distributed systems**. This project integrates post-quantum cryptographic algorithms with modern security frameworks.
+![Quantum SDK](https://img.shields.io/badge/Quantum%20SDK-Dilithium-blueviolet?style=flat-square)
+![Rust](https://img.shields.io/badge/Rust-cryptography-orange?style=flat-square)
+![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)
+
+> A high-assurance post-quantum Hardware Security Module (HSM) built in Rust.  
+> Powered by [Dilithium](https://pq-crystals.org/dilithium/) signatures and designed for blockchain-grade digital signing.
+
+---
 
 ##  Features
-- **Quantum-Resistant Cryptography**: Utilizes `pqcrypto_ntru` for NTRU-based encryption.
-- **Secure Key Management**: Implements safe generation, storage, and retrieval of cryptographic keys.
-- **Blockchain Integration**: Compatible with **Solana** and other blockchain ecosystems.
-- **Fast & Scalable**: Designed to support high-performance financial and security applications.
-- **Zero Trust Principles**: Implements strong authentication and data protection.
 
-## Installation
-Clone the repository:
+-  NIST-approved Dilithium digital signatures
+-  Secure in-memory key storage using `secrecy`
+-  Axum-powered API: `/generate`, `/sign`, `/verify`
+-  Supports message signing for Solana, Ethereum, and Bitcoin
+-  Ready for integration with validator or DeFi infrastructure
+
+---
+
+##  Installation
+
 ```bash
 git clone https://github.com/0rlych1kk4/quantum_hsm.git
 cd quantum_hsm
-cargo build
+cargo build --release
 
-## Usage
-Example usage of key generation:
-use quantum_hsm::crypto::generate_keypair;
-let (public_key, secret_key) = generate_keypair();
-println!("Public Key: {:?}", public_key);
+##  Usage
 
-## License
+Start the API server:
 
-This project is licensed under the MIT License.
+cargo run
+ Example: generate a keypair
+curl -X POST http://127.0.0.1:8080/generate \
+  -H "Content-Type: application/json" \
+  -d '{"wallet_id":"wallet1"}'
+️ Sign a message
+curl -X POST http://127.0.0.1:8080/sign \
+  -H "Content-Type: application/json" \
+  -d '{"wallet_id":"wallet1", "message":"48656c6c6f20776f726c64", "is_hex":true}'
+ Verify a signature
+curl -X POST http://127.0.0.1:8080/verify \
+  -H "Content-Type: application/json" \
+  -d '{"message":"48656c6c6f20776f726c64", "signature":"...", "public_key":"...", "is_hex":true}'
+##  API Endpoints
 
-## Contributing
-Contributions are welcome! Please open an issue or submit a pull request.
+Method	Endpoint	Description
+POST	/generate	Generate a new keypair
+POST	/sign	Sign a message using wallet ID
+POST	/verify	Verify a message + signature
 
-## Contact
+##  Release Notes
+
+See RELEASE_NOTES.md
+
+##  License
+
+This project is licensed under the MIT License. See LICENSE for full terms.
+
+##  Contributing
+
+Contributions welcome! Open issues or submit PRs — especially for blockchain support, multichain signing, or API extensions.
+
+##  Contact
 
 GitHub: 0rlych1kk4
-![Quantum SDK](https://img.shields.io/badge/Quantum%20SDK-Dilithium-blueviolet?style=flat-square)
+
