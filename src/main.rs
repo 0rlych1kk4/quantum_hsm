@@ -6,3 +6,4 @@ mod api;
 async fn main() {
     api::start_api_server().await;
 }
+
