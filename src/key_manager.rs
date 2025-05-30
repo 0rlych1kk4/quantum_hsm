@@ -1,8 +1,8 @@
-use pqcrypto_ntru::ntruhps2048509::{keypair, PublicKey};
-use pqcrypto_traits::kem::PublicKey as _; // Import the PublicKey trait from kem module
-use secrecy::{Secret, ExposeSecret};
+use pqcrypto_dilithium::dilithium2::{keypair, PublicKey, SecretKey};
+use pqcrypto_traits::sign::{PublicKey as _, SecretKey as TraitSecretKey};
+use secrecy::{ExposeSecret, Secret}; //  works with secrecy v0.8
 use std::collections::HashMap;
-use std::sync::Mutex;
+use parking_lot::Mutex;
 use lazy_static::lazy_static;
 use hex;
 
@@ -10,23 +10,24 @@ lazy_static! {
     static ref KEY_STORE: Mutex<HashMap<String, Secret<Vec<u8>>>> = Mutex::new(HashMap::new());
 }
 
-pub fn generate_ntru_keypair(wallet_id: &str) -> String {
-    let (public_key, private_key) = keypair();
-    
-    // Storing the private key securely
-    let mut keystore = KEY_STORE.lock().unwrap(); // The lock is applied correctly here
-    keystore.insert(wallet_id.to_string(), Secret::new(private_key.to_vec()));
-    
-    // Convert public key to bytes and then hex string
-    hex::encode(public_key.as_bytes()) // This should now work after importing the trait
+pub fn generate_dilithium_keypair(wallet_id: &str) -> String {
+    let (public_key, secret_key) = keypair();
+
+    let mut store = KEY_STORE.lock();
+    store.insert(wallet_id.to_string(), Secret::new(secret_key.as_bytes().to_vec()));
+
+    hex::encode(public_key.as_bytes())
 }
 
-pub fn get_private_key(wallet_id: &str) -> Option<Vec<u8>> {
-    let keystore = KEY_STORE.lock().unwrap(); // The lock is applied correctly here
-    keystore.get(wallet_id).map(|key| key.expose_secret().clone())
+pub fn get_private_key(wallet_id: &str) -> Option<SecretKey> {
+    let store = KEY_STORE.lock();
+    store.get(wallet_id).map(|secret_vec| {
+        SecretKey::from_bytes(secret_vec.expose_secret()).expect("Invalid private key format")
+    })
 }
 
 pub fn decode_public_key(hex_key: &str) -> Result<PublicKey, hex::FromHexError> {
-    let bytes = hex::decode(hex_key)?; // Decode the hex string into bytes
-    PublicKey::from_bytes(&bytes) // Use the from_bytes method to convert to PublicKey
+    let bytes = hex::decode(hex_key)?;
+    Ok(PublicKey::from_bytes(&bytes).unwrap())
 }
+
