@@ -32,3 +32,4 @@ Contributions are welcome! Please open an issue or submit a pull request.
 ## Contact
 
 GitHub: 0rlych1kk4
+![Quantum SDK](https://img.shields.io/badge/Quantum%20SDK-Dilithium-blueviolet?style=flat-square)
