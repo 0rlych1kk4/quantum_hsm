@@ -2,6 +2,7 @@ use axum::{Json, Router, routing::post};
 use serde::{Serialize, Deserialize};
 use crate::key_manager::generate_dilithium_keypair;
 use crate::signer::sign_message;
+use crate::verifier::verify_signature;
 use tokio::net::TcpListener;
 use hex;
 
@@ -13,7 +14,15 @@ struct KeyGenRequest {
 #[derive(Serialize, Deserialize)]
 struct SignRequest {
     wallet_id: String,
-    message: String, // plain text or hex
+    message: String,
+    is_hex: bool,
+}
+
+#[derive(Serialize, Deserialize)]
+struct VerifyRequest {
+    message: String,
+    signature: String,
+    public_key: String,
     is_hex: bool,
 }
 
@@ -38,10 +47,40 @@ async fn sign(Json(payload): Json<SignRequest>) -> Json<String> {
     }
 }
 
+async fn verify(Json(payload): Json<VerifyRequest>) -> Json<String> {
+    let msg_bytes = if payload.is_hex {
+        match hex::decode(&payload.message) {
+            Ok(bytes) => bytes,
+            Err(_) => return Json("Invalid hex message".to_string()),
+        }
+    } else {
+        payload.message.into_bytes()
+    };
+
+    let signature_bytes = match hex::decode(&payload.signature) {
+        Ok(bytes) => bytes,
+        Err(_) => return Json("Invalid hex for signature".to_string()),
+    };
+
+    let pubkey_bytes = match hex::decode(&payload.public_key) {
+        Ok(bytes) => bytes,
+        Err(_) => return Json("Invalid hex for public key".to_string()),
+    };
+
+    let valid = verify_signature(&msg_bytes, &signature_bytes, &pubkey_bytes);
+
+    Json(if valid {
+        "Signature valid".to_string()
+    } else {
+        "Invalid signature".to_string()
+    })
+}
+
 pub async fn start_api_server() {
     let app = Router::new()
         .route("/generate", post(generate_key))
-        .route("/sign", post(sign));
+        .route("/sign", post(sign))
+        .route("/verify", post(verify));
 
     let listener = TcpListener::bind("127.0.0.1:8080").await.unwrap();
     axum::serve(listener, app).await.unwrap();
