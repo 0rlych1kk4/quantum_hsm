@@ -8,8 +8,11 @@
 > Powered by [Dilithium](https://pq-crystals.org/dilithium/) signatures and designed for blockchain-grade digital signing.
 
 ---
+## Use Case
 
-##  Features
+-  Quantum Vault can be deployed by a crypto custody provider to replace traditional HSMs with quantum-safe signing APIs.
+-  For example, a Solana-based wallet provider can use /sign to generate Dilithium-signed transactions stored securely with secrecy.
+## Features
 
 -  NIST-approved Dilithium digital signatures
 -  Secure in-memory key storage using `secrecy`
